@@ -1,0 +1,12 @@
+# Hyperparameters for text summarization
+
+key_metrics:
+  rouge1: 0.45
+  rouge2: 0.35
+  rougeL: 0.40
+
+model_params:
+  max_length: 150
+  min_length: 50
+  temperature: 0.7
+  top_p: 0.95
