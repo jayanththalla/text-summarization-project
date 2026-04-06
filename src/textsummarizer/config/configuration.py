@@ -1,5 +1,5 @@
 from textsummarizer.constants import *
-from textsummarizer.entity import DataIngestionConfig, DataValidationConfig
+from textsummarizer.entity import DataIngestionConfig, DataValidationConfig, DataTransformationConfig
 from textsummarizer.utils.common import read_yaml, create_directories
 
 
@@ -48,3 +48,22 @@ class ConfigurationManager:
         )
 
         return data_validation_config
+
+    def get_data_transformation_config(self) -> DataTransformationConfig:
+        config = self.config.data_transformation
+
+        # Convert relative paths to absolute paths
+        root_dir = Path(config.root_dir) if Path(
+            config.root_dir).is_absolute() else PROJECT_ROOT / config.root_dir
+        data_path = Path(config.data_path) if Path(
+            config.data_path).is_absolute() else PROJECT_ROOT / config.data_path
+
+        create_directories([root_dir])
+
+        data_transformation_config = DataTransformationConfig(
+            root_dir=root_dir,
+            data_path=data_path,
+            tokenizer_name=config.tokenizer_name
+        )
+
+        return data_transformation_config

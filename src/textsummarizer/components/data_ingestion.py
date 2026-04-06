@@ -22,6 +22,10 @@ class DataIngestion:
 
     def download_file(self):
         if not os.path.exists(self.config.local_data_file):
+            # Ensure parent directory exists
+            Path(self.config.local_data_file).parent.mkdir(
+                parents=True, exist_ok=True)
+
             filename, headers = request.urlretrieve(
                 url=self.config.source_URL,
                 filename=self.config.local_data_file
@@ -38,7 +42,12 @@ class DataIngestion:
         Extracts the zip file into the data directory
         Function returns None
         """
-        unzip_path = self.config.unzip_dir
-        os.makedirs(unzip_path, exist_ok=True)
-        with zipfile.ZipFile(self.config.local_data_file, 'r') as zip_ref:
-            zip_ref.extractall(unzip_path)
+        # Convert to absolute path to avoid Windows relative path issues
+        unzip_path = Path(self.config.unzip_dir).resolve()
+        unzip_path.mkdir(parents=True, exist_ok=True)
+
+        # Convert paths to strings for zipfile
+        with zipfile.ZipFile(str(self.config.local_data_file), 'r') as zip_ref:
+            zip_ref.extractall(str(unzip_path))
+
+        logger.info(f"Dataset extracted to {unzip_path}")
