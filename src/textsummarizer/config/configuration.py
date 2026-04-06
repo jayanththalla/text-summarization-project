@@ -1,5 +1,5 @@
 from textsummarizer.constants import *
-from textsummarizer.entity import DataIngestionConfig
+from textsummarizer.entity import DataIngestionConfig, DataValidationConfig
 from textsummarizer.utils.common import read_yaml, create_directories
 
 
@@ -27,3 +27,24 @@ class ConfigurationManager:
         )
 
         return data_ingestion_config
+
+    def get_data_validation_config(self) -> DataValidationConfig:
+        config = self.config.data_validation
+
+        # Convert relative paths to absolute paths
+        root_dir = Path(config.root_dir) if Path(
+            config.root_dir).is_absolute() else PROJECT_ROOT / config.root_dir
+        status_file = Path(config.STATUS_FILE) if Path(
+            config.STATUS_FILE).is_absolute() else PROJECT_ROOT / config.STATUS_FILE
+
+        create_directories([root_dir])
+        # Ensure status file directory exists
+        create_directories([status_file.parent])
+
+        data_validation_config = DataValidationConfig(
+            root_dir=root_dir,
+            STATUS_FILE=str(status_file),
+            ALL_REQUIRED_FILES=config.ALL_REQUIRED_FILES,
+        )
+
+        return data_validation_config
